@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="bookingModalLabel">Make a Table Reservation</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form id="bookingForm">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" value="{{ user.name if user else '' }}" {% if user %}readonly{% endif %} required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" value="{{ user.email if user else '' }}" {% if user %}readonly{% endif %} required>
+        </div>
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" required>
+        </div>
+        <div class="mb-3">
+            <label for="time" class="form-label">Time</label>
+            <input type="time" class="form-control" id="time" required>
+        </div>
+        <div class="mb-3">
+            <label for="guests" class="form-label">Number of Guests</label>
+            <input type="number" class="form-control" id="guests" min="1" max="20" required>
+        </div>
+        <div class="mb-3">
+            <label for="table_id" class="form-label">Select Table</label>
+            <select class="form-control" id="table_id" required>
+                <option value="">Choose a table</option>
+                {% for table in tables %}
+                    <option value="{{ table.id }}">{{ table.table_number }} (Capacity: {{ table.capacity }})</option>
+                {% endfor %}
+            </select>
+            {% if not tables %}
+                <p class="text-danger">No tables available.</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Book Now</button>
+    </form>
+</div>

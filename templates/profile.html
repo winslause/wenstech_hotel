@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="container mt-5 profile-section">
+    <h2 class="mb-4">Welcome, {{ user.name }}</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">Update Profile</div>
+                <div class="card-body">
+                    <form id="updateProfileForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" value="{{ user.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" value="{{ user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">New Password (leave blank to keep current)</label>
+                            <input type="password" class="form-control" id="password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">Your Bookings</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Guests</th>
+                                    <th>Table</th>
+                                    <th>Items</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in user.bookings %}
+                                    <tr>
+                                        <td>{{ booking.id }}</td>
+                                        <td>{{ booking.date }}</td>
+                                        <td>{{ booking.time }}</td>
+                                        <td>{{ booking.guests }}</td>
+                                        <td>{{ booking.table.table_number if booking.table else 'N/A' }}</td>
+                                        <td>{{ booking.items or 'None' }}</td>
+                                        <td>{{ booking.status }}</td>
+                                        <td>
+                                            {% if booking.status == 'Pending' %}
+                                                <button class="btn btn-sm btn-primary edit-booking-btn" data-id="{{ booking.id }}">Edit</button>
+                                                <button class="btn btn-sm btn-danger cancel-booking-btn" data-id="{{ booking.id }}">Cancel</button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">Your Food Orders</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Table</th>
+                                    <th>Items</th>
+                                    <th>Special Requests</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in user.food_orders %}
+                                    <tr>
+                                        <td>{{ order.id }}</td>
+                                        <td>{{ order.table.table_number if order.table else 'N/A' }}</td>
+                                        <td>{{ order.items }}</td>
+                                        <td>{{ order.special_requests or 'None' }}</td>
+                                        <td>{{ order.status }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editBookingModal" tabindex="-1" aria-labelledby="editBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            {% include 'edit_booking_form.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

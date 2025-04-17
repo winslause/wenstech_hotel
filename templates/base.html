@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUNSET - {% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Updated floating-sidebar style from service.html */
+        .floating-sidebar {
+            position: fixed;
+            top: 100px;
+            right: 0;
+            width: 280px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 1050;
+            border-radius: 8px 0 0 8px;
+            transition: transform 0.3s ease;
+            transform: translateX(100%);
+        }
+
+        .floating-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .floating-sidebar h5 {
+            margin-bottom: 15px;
+            font-weight: bold;
+            border-bottom: 2px solid #f5a623;
+            padding-bottom: 10px;
+            color: #333;
+        }
+
+        .floating-sidebar ul {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .floating-sidebar ul li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .floating-sidebar h6 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #f5a623;
+        }
+
+        .floating-sidebar p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .floating-icon {
+            position: fixed;
+            top: 110px;
+            right: 10px;
+            background-color: #f5a623;
+            border: none;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 50%;
+            z-index: 1100;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-icon i {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">SUNSET</a>
+            <span style="font-family: 'Cursive', sans-serif; font-size: 20px; color: #7d6e75;"><i>HOTEL</i></span>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon animate-toggler"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/services">Services</a></li>
+                    {% if session['user_email'] %}
+                        <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a></li>
+                    {% endif %}
+                    {% if session['admin'] %}
+                        <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Sidebar -->
+    <div class="floating-sidebar" id="floating-sidebar">
+        <h5>Our Menu</h5>
+        {% if meals %}
+            <ul class="list-unstyled">
+                {% for meal in meals %}
+                    <li>
+                        <h6>{{ meal.name }}</h6>
+                        <p>{{ meal.description or 'Delicious dish' }} - SH.{{ meal.price }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No meals available.</p>
+        {% endif %}
+    </div>
+    <button class="floating-icon" id="floating-icon"><i class="fas fa-bars"></i></button>
+
+    <!-- Content -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="login_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="login_email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="login_password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="login_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {% include 'register_form.html' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {% include 'booking_form.html' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="serviceBookingModal" tabindex="-1" aria-labelledby="serviceBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {% include 'service_booking_form.html' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="foodOrderModal" tabindex="-1" aria-labelledby="foodOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                {% include 'food_order_form.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p>Sunset Blvd, Nairobi</p>
+                    <p>Email: info@sunset.com</p>
+                    <p>Phone: (254) 456-7890</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/services">Services</a></li>
+                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#bookingModal">Book a Table</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>© 2025 SUNSET. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <style>
+        @media (max-width: 768px) {
+          .footer .row > .col-md-4 {
+            flex: 0 0 50%;
+            max-width: 50%;
+            margin-bottom: 20px;
+          }
+      
+          /* Optional: center the last column if there's space */
+          .footer .row > .col-md-4:last-child:nth-child(3) {
+            flex: 0 0 100%;
+            max-width: 100%;
+            text-align: center;
+          }
+        }
+      </style>
+      
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Sidebar toggle script
+        document.getElementById('floating-icon').addEventListener('click', function () {
+            const sidebar = document.getElementById('floating-sidebar');
+            sidebar.classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

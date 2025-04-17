@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="editBookingModalLabel">Edit Booking</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form id="editBookingForm">
+        <input type="hidden" id="booking_id">
+        <div class="mb-3">
+            <label for="edit_date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="edit_date" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_time" class="form-label">Time</label>
+            <input type="time" class="form-control" id="edit_time" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_guests" class="form-label">Number of Guests</label>
+            <input type="number" class="form-control" id="edit_guests" min="1" max="20" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_table_id" class="form-label">Select Table</label>
+            <select class="form-control" id="edit_table_id" required>
+                <option value="">Choose a table</option>
+                {% for table in tables %}
+                    <option value="{{ table.id }}">{{ table.table_number }} (Capacity: {{ table.capacity }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Select Meals</label>
+            {% if meals %}
+                {% for meal in meals %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{ meal.name }}" id="edit_meal_{{ meal.id }}">
+                        <label class="form-check-label" for="edit_meal_{{ meal.id }}">{{ meal.name }} (SH.{{ meal.price }})</label>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No meals available.</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Update Booking</button>
+    </form>
+</div>

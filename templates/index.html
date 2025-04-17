@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<main>
+    <section class="hero-section">
+        <div class="slideshow-container">
+            <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');"></div>
+            <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9');"></div>
+            <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1515003197210-e0cd71810b5f');"></div>
+            <div class="slide" style="background-image: url('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/13/57/23/restaurant-side-with.jpg?w=600&h=-1&s=1');"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Welcome to SUNSET</h1>
+            <p>Experience exquisite dining with a view. Book your table today!</p>
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#bookingModal">Reserve a Table</button>
+            <button class="btn btn-secondary mt-3 ms-2" data-bs-toggle="modal" data-bs-target="#foodOrderModal">Order Food</button>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUNSET - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">SUNSET Admin</a>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text me-3">Admin</span>
+                <a href="/admin/logout" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <button class="sidebar-toggle btn btn-dark d-md-none" aria-label="Toggle Sidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="#bookings" data-section="bookings">Bookings</a>
+            <a class="nav-link" href="#orders" data-section="orders">Orders</a>
+            <a class="nav-link" href="#meals" data-section="meals">Meals</a>
+            <a class="nav-link" href="#tables" data-section="tables">Tables</a>
+            <a class="nav-link" href="#services" data-section="services">Services</a>
+            <a class="nav-link" href="#special-services" data-section="special-services">Special Services</a>
+            <a class="nav-link" href="#users" data-section="users">Users</a>
+            <a class="nav-link" href="#change-password" data-section="change-password" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Bookings -->
+            <section id="bookings" class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Bookings</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Guests</th>
+                                <th>Table</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                                <tr>
+                                    <td>{{ booking.id }}</td>
+                                    <td>{{ booking.name }}</td>
+                                    <td>{{ booking.email }}</td>
+                                    <td>{{ booking.date }}</td>
+                                    <td>{{ booking.time }}</td>
+                                    <td>{{ booking.guests }}</td>
+                                    <td>{{ booking.table.table_number if booking.table else 'N/A' }}</td>
+                                    <td>
+                                        <select class="status-select form-select form-select-sm" data-id="{{ booking.id }}" data-type="booking">
+                                            <option value="Pending" {{ 'selected' if booking.status == 'Pending' }}>Pending</option>
+                                            <option value="Confirmed" {{ 'selected' if booking.status == 'Confirmed' }}>Confirmed</option>
+                                            <option value="Cancelled" {{ 'selected' if booking.status == 'Cancelled' }}>Cancelled</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-booking-btn" data-id="{{ booking.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Orders -->
+            <section id="orders" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Food Orders</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Table</th>
+                                <th>Items</th>
+                                <th>Special Requests</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.id }}</td>
+                                    <td>{{ order.user.name }}</td>
+                                    <td>{{ order.table.table_number if order.table else 'N/A' }}</td>
+                                    <td>{{ order.items }}</td>
+                                    <td>{{ order.special_requests or 'None' }}</td>
+                                    <td>
+                                        <select class="status-select form-select form-select-sm" data-id="{{ order.id }}" data-type="order">
+                                            <option value="Pending" {{ 'selected' if order.status == 'Pending' }}>Pending</option>
+                                            <option value="Confirmed" {{ 'selected' if order.status == 'Confirmed' }}>Confirmed</option>
+                                            <option value="Cancelled" {{ 'selected' if order.status == 'Cancelled' }}>Cancelled</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-order-btn" data-id="{{ order.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Meals -->
+            <section id="meals" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Meals</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMealModal">Add Meal</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meal in meals %}
+                                <tr>
+                                    <td>{{ meal.id }}</td>
+                                    <td>{{ meal.name }}</td>
+                                    <td>{{ meal.description or 'N/A' }}</td>
+                                    <td>SH.{{ meal.price }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-meal-btn" data-id="{{ meal.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tables -->
+            <section id="tables" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Tables</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTableModal">Add Table</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Table Number</th>
+                                <th>Capacity</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for table in tables %}
+                                <tr>
+                                    <td>{{ table.id }}</td>
+                                    <td>{{ table.table_number }}</td>
+                                    <td>{{ table.capacity }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-table-btn" data-id="{{ table.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Services -->
+            <section id="services" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Services</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">Add Service</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Image</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for service in services %}
+                                <tr>
+                                    <td>{{ service.id }}</td>
+                                    <td>{{ service.title }}</td>
+                                    <td>{{ service.description }}</td>
+                                    <td>SH.{{ service.price }}</td>
+                                    <td>
+                                        {% if service.image_url and service.image_url != '' %}
+                                            <img src="{{ service.image_url }}" alt="{{ service.title }}" class="img-thumbnail" style="max-width: 50px;" onerror="this.src='/static/images/fallback.jpg'; this.onerror=null;">
+                                        {% else %}
+                                            <span>No Image</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm edit-service-btn" data-id="{{ service.id }}" data-title="{{ service.title }}" data-description="{{ service.description }}" data-price="{{ service.price }}" data-image-url="{{ service.image_url }}">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-service-btn" data-id="{{ service.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Special Services -->
+            <section id="special-services" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Special Services</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSpecialServiceModal">Add Special Service</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for special_service in special_services %}
+                                <tr>
+                                    <td>{{ special_service.id }}</td>
+                                    <td>{{ special_service.title }}</td>
+                                    <td>{{ special_service.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Users -->
+            <section id="users" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Manage Users</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm edit-user-btn" data-id="{{ user.id }}" data-name="{{ user.name }}" data-email="{{ user.email }}">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-user-btn" data-id="{{ user.id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Change Password (placeholder section for navigation) -->
+            <section id="change-password" class="content-section d-none"></section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Add Service Modal -->
+    <div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addServiceModalLabel">Add Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addServiceForm">
+                        <div class="mb-3">
+                            <label for="service_title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="service_title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="service_description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service_price" class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" id="service_price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="service_image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="service_image" accept="image/*" required>
+                            <img id="service_image_preview" class="img-thumbnail mt-2 d-none" style="max-width: 100px;" alt="Preview">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Service</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editServiceForm">
+                        <input type="hidden" id="service_id">
+                        <div class="mb-3">
+                            <label for="edit_service_title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="edit_service_title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_service_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit_service_description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_service_price" class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" id="edit_service_price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_service_image" class="form-label">Image (optional)</label>
+                            <input type="file" class="form-control" id="edit_service_image" accept="image/*">
+                            <img id="edit_service_image_preview" class="img-thumbnail mt-2 d-none" style="max-width: 100px;" alt="Preview">
+                            <img id="edit_service_current_image" class="img-thumbnail mt-2" style="max-width: 100px;" alt="Current Image">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Service</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Special Service Modal -->
+    <div class="modal fade" id="addSpecialServiceModal" tabindex="-1" aria-labelledby="addSpecialServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSpecialServiceModalLabel">Add Special Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSpecialServiceForm">
+                        <div class="mb-3">
+                            <label for="special_service_title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="special_service_title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="special_service_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="special_service_description" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Special Service</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Meal Modal -->
+    <div class="modal fade" id="addMealModal" tabindex="-1" aria-labelledby="addMealModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMealModalLabel">Add Meal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMealForm">
+                        <div class="mb-3">
+                            <label for="meal_name" class="form-label">Meal Name</label>
+                            <input type="text" class="form-control" id="meal_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="meal_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="meal_description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="meal_price" class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" id orbit
+                            id="meal_price" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Meal</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Table Modal -->
+    <div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTableModalLabel">Add Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTableForm">
+                        <div class="mb-3">
+                            <label for="table_number" class="form-label">Table Number</label>
+                            <input type="text" class="form-control" id="table_number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="table_capacity" class="form-label">Capacity</label>
+                            <input type="number" class="form-control" id="table_capacity" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Table</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="user_id">
+                        <div class="mb-3">
+                            <label for="user_name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="user_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="user_email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user_password" class="form-label">New Password (optional)</label>
+                            <input type="password" class="form-control" id="user_password">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

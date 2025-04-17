@@ -1,0 +1,122 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #212529;
+    color: #fff;
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 10px 20px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: #343a40;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 10px;
+    right: -40px;
+    z-index: 1001;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 80px 20px 20px;
+    transition: margin-left 0.3s ease;
+}
+
+.content-section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.table {
+    background-color: #fff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table-dark {
+    background-color: #343a40;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger {
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#service_image_preview {
+    transition: opacity 0.3s;
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        transform: translateX(-250px);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        display: block !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .sidebar-toggle {
+        display: none;
+    }
+}
