@@ -39,7 +39,7 @@ $(document).ready(function() {
         const formData = new FormData();
         formData.append('title', $('#service_title').val());
         formData.append('description', $('#service_description').val());
-        formData.append('price', $('#	service_price').val());
+        formData.append('price', $('#service_price').val());
         formData.append('image', $('#service_image')[0].files[0]);
         console.log('Submitting service form');
         $.ajax({
@@ -172,7 +172,9 @@ $(document).ready(function() {
     // Add Meal Form
     $('#addMealForm').submit(function(e) {
         e.preventDefault();
+        console.log("raw price value: ", $('#meal_price').val());
         const price = parseFloat($('#meal_price').val());
+        
         if (isNaN(price) || price <= 0) {
             alert('Please enter a valid price.');
             return;
